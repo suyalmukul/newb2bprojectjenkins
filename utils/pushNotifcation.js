@@ -4,12 +4,35 @@ const fs = require('fs');
 
 
 // Initialize the Firebase Admin SDK with your service account credentials
-const serviceAccount = require('../config/serviceAccountKey.json');
 const { default: axios } = require('axios');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  // messagingSenderId: senderId,
-});
+let adminAvailable = false;
+try {
+  const serviceAccountPath = require('path').join(__dirname, '..', 'config', 'serviceAccountKey.json');
+  if (fs.existsSync(serviceAccountPath)) {
+    const serviceAccount = require(serviceAccountPath);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+    adminAvailable = true;
+    console.log('Firebase admin initialized using serviceAccountKey.json');
+  } else if (process.env.SERVICE_ACCOUNT_JSON) {
+    // Optionally allow providing service account JSON via env var
+    try {
+      const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_JSON);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+      adminAvailable = true;
+      console.log('Firebase admin initialized using SERVICE_ACCOUNT_JSON env var');
+    } catch (err) {
+      console.warn('SERVICE_ACCOUNT_JSON is set but invalid JSON');
+    }
+  } else {
+    console.warn('Firebase service account not found. Push notifications via FCM will be disabled.');
+  }
+} catch (err) {
+  console.error('Error initializing Firebase admin:', err.message);
+}
 
 // Function to send a push notification to a device token using FCM
 async function sendNotification(deviceToken, title, body) {
@@ -23,11 +46,18 @@ async function sendNotification(deviceToken, title, body) {
 
 
 
+  if (!adminAvailable) {
+    console.warn('FCM not initialized — skipping sendNotification');
+    return null;
+  }
+
   try {
     const response = await admin.messaging().send(message);
     console.log('Notification sent successfully:', response);
+    return response;
   } catch (error) {
     console.error('Error sending notification:', error);
+    throw error;
   }
 }
 
