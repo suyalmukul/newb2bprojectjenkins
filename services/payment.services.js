@@ -2,12 +2,25 @@ const Razorpay = require('razorpay');
 const AppError = require('../utils/errorHandler');
 const PaymentDetails = require('../models/paymenDetails.model');
 
-// console.log(process.env, 'process.env...............')
+// Lazily create Razorpay client so missing env vars don't crash app at startup
+let razorpayInstance = null;
+function getRazorpay() {
+    if (razorpayInstance) return razorpayInstance;
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_API_KEY,
-    key_secret: process.env.RAZORPAY_APT_SECRET
-});
+    const keyId = process.env.RAZORPAY_API_KEY;
+    const keySecret = process.env.RAZORPAY_APT_SECRET;
+
+    if (!keyId && !process.env.RAZORPAY_OAUTH_TOKEN) {
+        // do not crash at require-time; throw when payment functionality is used
+        throw new Error('Razorpay credentials missing: set RAZORPAY_API_KEY and RAZORPAY_APT_SECRET (or RAZORPAY_OAUTH_TOKEN)');
+    }
+
+    razorpayInstance = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret
+    });
+    return razorpayInstance;
+}
 
 // Function to initiate a payment
 const initiatePayment = async (amount, notes, next) => {
@@ -18,6 +31,7 @@ const initiatePayment = async (amount, notes, next) => {
             // receipt: receipt,
             notes: notes
         };
+        const razorpay = getRazorpay();
         const payment = await razorpay.orders.create(paymentOptions);
         return payment;
     } catch (error) {
@@ -29,6 +43,7 @@ const initiatePayment = async (amount, notes, next) => {
 // Function to verify a payment
 const verifyPayment = async (paymentId, orderId, paymentSignature, next) => {
     try {
+        const razorpay = getRazorpay();
         const payment = await razorpay.payments.fetch(paymentId);
         if (payment.order_id === orderId && razorpay.utils.verifyPaymentSignature(payment, paymentSignature)) {
             return true;
@@ -43,7 +58,8 @@ const verifyPayment = async (paymentId, orderId, paymentSignature, next) => {
 const makePayment = async (next) => {
     try {
         // Simulate payment using test card details
-        const payment = razorpay.payments.capture('PAYMENT_ID', 1000); // Use actual payment ID
+        const razorpay = getRazorpay();
+        const payment = await razorpay.payments.capture('PAYMENT_ID', 1000); // Use actual payment ID
         return payment;
     } catch (error) {
         console.error('Error making payment:', error);
@@ -54,6 +70,7 @@ const makePayment = async (next) => {
 
 // Function to handle Razorpay webhook events
 const handleWebhook = async (body, signature, next) => {
+    const razorpay = getRazorpay();
     const isValidSignature = razorpay.webhooks.validateWebhookSignature(body, signature, 'YOUR_WEBHOOK_SECRET');
     if (isValidSignature) {
         // Handle the webhook event
