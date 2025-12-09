@@ -1,0 +1,400 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const QuickOrderStatusSchema = new Schema(
+  {
+    storeID: { type: mongoose.Schema.Types.ObjectId, ref: "stores" },
+    customerID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OfflineCustomerB2C",
+    },
+    productID: { type: mongoose.Schema.Types.ObjectId, ref: "CustomerProduct" },
+    stylishId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    ProductAlterationID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "customerProductAlteration",
+    },
+    measurementAlterationID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerMesurmentAlteration",
+    },
+    specialIntructionAlterationID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerSpacialInstructionAltreation",
+    },
+    orderNumber: { type: String },
+    measurementID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerMesurment",
+    },
+    specialIntructionID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerSpacialInstruction",
+    },
+    constrastID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerContrast",
+    },
+    readyMadeProductID: { type: mongoose.Schema.Types.ObjectId },
+    readyMadeAccessoriesID: { type: mongoose.Schema.Types.ObjectId },
+    billInvoiceID: { type: mongoose.Schema.Types.ObjectId },
+    status: { type: Boolean, default: false },
+    activeStatus: { type: Boolean, default: true },
+    markedStatus: { type: String, enum: ["Completed", "Incomplete"] },
+    orderType: { type: String },
+    disputed: [
+      {
+        status: { type: Boolean, default: false },
+        disputedtatements: [
+          {
+            photo: { type: String },
+            video: { type: String },
+            voicerecording: { type: String },
+          },
+        ],
+        productId: { type: mongoose.Schema.Types.ObjectId },
+      },
+    ],
+    aligned: [
+      {
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        alignedTo: {
+          type: String,
+          enum: [
+            "manager",
+            "sales",
+            "cutter",
+            "helper",
+            "mastertailor",
+            "embroidery",
+            "accessories",
+            "stitching",
+            "trims",
+            "QC",
+            "delivery",
+            "stylish",
+            "admin",
+            "None",
+          ],
+          default: "None",
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        alignedStatus: { type: Boolean, default: false },
+        isHelper: { type: Boolean, default: false },
+        isEmbroidery: { type: Boolean, default: false },
+      },
+    ],
+    reAligned: [
+      {
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        reAlignedTo: {
+          type: String,
+          enum: [
+            "manager",
+            "sales",
+            "cutter",
+            "helper",
+            "mastertailor",
+            "embroidery",
+            "accessories",
+            "stitching",
+            "trims",
+            "QC",
+            "delivery",
+            "stylish",
+            "admin",
+            "None",
+          ],
+          default: "None",
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        reAlignedStatus: { type: Boolean, default: false },
+      },
+    ],
+    notAssignedProductIds: [
+      {
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        isHelper: { type: Boolean, default: false },
+        isEmbroidery: { type: Boolean, default: false },
+        isLovojFabric: { type: Boolean, default: false },
+        qrflag: { type: String, enum: ["cutter", "admin"] },
+      },
+    ],
+    cutterStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    mastertailorStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    embroideryStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    helperStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    stitchingStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    trimsStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    QCStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    deliveryStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    stylishStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+    adminStatus: [
+      {
+        status: {
+          type: String,
+          enum: ["NotAssigned", "InProgress", "Completed"],
+          default: "NotAssigned",
+        },
+        workerId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+        editedRole: { type: String },
+        workerName: { type: String },
+        productNumber: { type: String },
+        productId: { type: mongoose.Schema.Types.ObjectId },
+        problem: {
+          type: Boolean,
+          default: false,
+        },
+        timmer: {
+          type: String,
+        },
+        timmer1: {
+          type: String,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const QuickOrderStatus = mongoose.model(
+  "QuickOrderStatus",
+  QuickOrderStatusSchema
+);
+
+module.exports = QuickOrderStatus;
