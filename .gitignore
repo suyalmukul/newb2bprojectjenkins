@@ -3,4 +3,3 @@ test.js
 package-lock.json
 .env
 config/serviceAccountKey.json
-config/secretsManager.js
